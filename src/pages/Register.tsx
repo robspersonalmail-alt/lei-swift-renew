@@ -7,6 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Building2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { countries, getCountryName } from "@/data/countries";
+import { legalForms, getLegalFormsByJurisdiction, getLegalFormName } from "@/data/legalForms";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -87,14 +89,14 @@ const Register = () => {
     try {
       const { supabase } = await import("@/integrations/supabase/client");
       
-      // Prepare clean data for submission
+      // Prepare clean data for submission with proper codes
       const cleanFormData = {
         ...formData,
         legalName: formData.legalName.trim(),
-        jurisdiction: formData.jurisdiction.trim(),
+        jurisdiction: formData.jurisdiction.trim(), // This is now an ISO code
         address: formData.address.trim(),
         city: formData.city.trim(),
-        country: formData.country.trim().toUpperCase(), // Country codes are typically uppercase
+        country: formData.country.trim(), // This is now an ISO code
         postalCode: formData.postalCode.trim(),
         registrationNumber: formData.registrationNumber.trim(),
         contactEmail: formData.contactEmail.trim().toLowerCase(),
@@ -180,30 +182,39 @@ const Register = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="legalForm">Legal Form</Label>
-                      <Select value={formData.legalForm} onValueChange={(value) => handleInputChange("legalForm", value)}>
+                      <Label htmlFor="jurisdiction">Jurisdiction</Label>
+                      <Select value={formData.jurisdiction} onValueChange={(value) => handleInputChange("jurisdiction", value)}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select legal form" />
+                          <SelectValue placeholder="Select jurisdiction" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="corporation">Corporation</SelectItem>
-                          <SelectItem value="llc">Limited Liability Company</SelectItem>
-                          <SelectItem value="partnership">Partnership</SelectItem>
-                          <SelectItem value="trust">Trust</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
+                        <SelectContent className="bg-background border max-h-60 overflow-y-auto">
+                          {countries.map((country) => (
+                            <SelectItem key={country.code} value={country.code}>
+                              {country.name} ({country.code})
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="jurisdiction">Jurisdiction</Label>
-                      <Input
-                        id="jurisdiction"
-                        value={formData.jurisdiction}
-                        onChange={(e) => handleInputChange("jurisdiction", e.target.value)}
-                        placeholder="Jurisdiction of incorporation"
-                        required
-                      />
+                      <Label htmlFor="legalForm">Legal Form</Label>
+                      <Select 
+                        value={formData.legalForm} 
+                        onValueChange={(value) => handleInputChange("legalForm", value)}
+                        disabled={!formData.jurisdiction}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={formData.jurisdiction ? "Select legal form" : "Select jurisdiction first"} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border max-h-60 overflow-y-auto">
+                          {getLegalFormsByJurisdiction(formData.jurisdiction).map((form) => (
+                            <SelectItem key={form.code} value={form.code}>
+                              {form.name} ({form.code})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div className="space-y-2">
@@ -260,13 +271,18 @@ const Register = () => {
 
                       <div className="space-y-2">
                         <Label htmlFor="country">Country</Label>
-                        <Input
-                          id="country"
-                          value={formData.country}
-                          onChange={(e) => handleInputChange("country", e.target.value)}
-                          placeholder="Country"
-                          required
-                        />
+                        <Select value={formData.country} onValueChange={(value) => handleInputChange("country", value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select country" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background border max-h-60 overflow-y-auto">
+                            {countries.map((country) => (
+                              <SelectItem key={country.code} value={country.code}>
+                                {country.name} ({country.code})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </div>
                   </div>
