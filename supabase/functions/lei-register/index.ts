@@ -56,7 +56,7 @@ serve(async (req) => {
     const registrationPayload = {
       legalName: formData.legalName,
       legalForm: formData.legalForm,
-      jurisdiction: formData.jurisdiction,
+      legalJurisdiction: formData.jurisdiction,
       registrationNumber: formData.registrationNumber,
       address: {
         streetAddress: formData.address,
