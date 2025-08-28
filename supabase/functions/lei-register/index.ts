@@ -41,7 +41,7 @@ serve(async (req) => {
     };
 
     // Make request to RapidLEI API
-    const response = await fetch(`${RAPIDLEI_BASE_URL}/lei/register`, {
+    const response = await fetch(`${RAPIDLEI_BASE_URL}/v1/leis/orders/create`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${RAPIDLEI_API_KEY}`,

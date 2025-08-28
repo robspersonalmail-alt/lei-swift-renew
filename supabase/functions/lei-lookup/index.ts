@@ -29,7 +29,7 @@ serve(async (req) => {
     console.log('Looking up LEI:', leiNumber);
 
     // Make request to RapidLEI API to lookup LEI
-    const response = await fetch(`${RAPIDLEI_BASE_URL}/lei/${leiNumber}`, {
+    const response = await fetch(`${RAPIDLEI_BASE_URL}/v1/leis/${leiNumber}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${RAPIDLEI_API_KEY}`,
