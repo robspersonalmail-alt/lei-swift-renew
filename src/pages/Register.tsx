@@ -29,7 +29,10 @@ const Register = () => {
     website: "",
     contactEmail: "",
     firstName: "",
-    lastName: ""
+    lastName: "",
+    contactPhone: "",
+    isLevel2DataAvailable: false,
+    multiYearSupport: 1
   });
 
   // Load supported jurisdictions on component mount
@@ -76,11 +79,13 @@ const Register = () => {
       { field: 'city', message: 'City is required' },
       { field: 'postalCode', message: 'Postal Code is required' },
       { field: 'country', message: 'Country is required' },
-      { field: 'contactEmail', message: 'Contact Email is required' }
+      { field: 'contactEmail', message: 'Contact Email is required' },
+      { field: 'contactPhone', message: 'Contact Phone is required' }
     ];
 
     for (const { field, message } of requiredFields) {
-      if (!formData[field as keyof typeof formData]?.trim()) {
+      const value = formData[field as keyof typeof formData];
+      if (!value || (typeof value === 'string' && !value.trim())) {
         toast({
           title: "Required Field Missing",
           description: message,
@@ -169,7 +174,7 @@ const Register = () => {
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | number | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -381,6 +386,18 @@ const Register = () => {
                         value={formData.contactEmail}
                         onChange={(e) => handleInputChange("contactEmail", e.target.value)}
                         placeholder="contact@example.com"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="contactPhone">Contact Phone</Label>
+                      <Input
+                        id="contactPhone"
+                        type="tel"
+                        value={formData.contactPhone}
+                        onChange={(e) => handleInputChange("contactPhone", e.target.value)}
+                        placeholder="+1234567890"
                         required
                       />
                     </div>

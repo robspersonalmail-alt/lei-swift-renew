@@ -60,13 +60,17 @@ serve(async (req) => {
       companyNumber: formData.registrationNumber,
       firstName: formData.firstName,
       lastName: formData.lastName,
+      phone: formData.contactPhone,
+      email: formData.contactEmail,
+      isLevel2DataAvailable: formData.isLevel2DataAvailable || false,
+      multiYearSupport: formData.multiYearSupport || 1,
+      reportingExceptionReason: formData.isLevel2DataAvailable ? undefined : "NO_KNOWN_PERSON",
       address: {
         streetAddress: formData.address,
         city: formData.city,
         postalCode: formData.postalCode,
         country: formData.country
       },
-      contactEmail: formData.contactEmail,
       website: formData.website
     };
 
