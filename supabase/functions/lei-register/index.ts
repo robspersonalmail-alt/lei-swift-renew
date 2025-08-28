@@ -54,7 +54,7 @@ serve(async (req) => {
 
     // Prepare the LEI registration request according to RapidLEI API specs
     const registrationPayload = {
-      legalName: formData.legalName,
+      companyName: formData.legalName,
       legalForm: formData.legalForm,
       legalJurisdiction: formData.jurisdiction,
       registrationNumber: formData.registrationNumber,
