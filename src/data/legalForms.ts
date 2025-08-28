@@ -42,11 +42,11 @@ export const legalForms: LegalForm[] = [
   { code: "REIT", name: "Real Estate Investment Trust", jurisdiction: "US" },
   
   // German specific
-  { code: "GMBH", name: "Gesellschaft mit beschränkter Haftung", jurisdiction: "DE" },
+  { code: "GMBH", name: "Gesellschaft mit beschränkter Haftung (GmbH)", jurisdiction: "DE" },
   { code: "AG", name: "Aktiengesellschaft", jurisdiction: "DE" },
   { code: "KG", name: "Kommanditgesellschaft", jurisdiction: "DE" },
   { code: "OHG", name: "Offene Handelsgesellschaft", jurisdiction: "DE" },
-  { code: "GMBH", name: "GmbH & Co. KG", jurisdiction: "DE" },
+  { code: "GMBHKG", name: "GmbH & Co. KG", jurisdiction: "DE" },
   { code: "UG", name: "Unternehmergesellschaft", jurisdiction: "DE" },
   
   // French specific

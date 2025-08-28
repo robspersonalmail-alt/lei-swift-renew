@@ -15,6 +15,8 @@ const Register = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [supportedJurisdictions, setSupportedJurisdictions] = useState<any[]>([]);
+  const [loadingJurisdictions, setLoadingJurisdictions] = useState(true);
   const [formData, setFormData] = useState({
     legalName: "",
     legalForm: "",
@@ -27,6 +29,35 @@ const Register = () => {
     website: "",
     contactEmail: ""
   });
+
+  // Load supported jurisdictions on component mount
+  React.useEffect(() => {
+    const loadSupportedJurisdictions = async () => {
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data, error } = await supabase.functions.invoke('lei-lookup-jurisdictions');
+        
+        if (error) {
+          console.error('Failed to load supported jurisdictions:', error);
+          // Fallback to predefined list
+          setSupportedJurisdictions(getSupportedJurisdictions());
+        } else if (data?.success && data?.jurisdictions) {
+          setSupportedJurisdictions(data.jurisdictions);
+        } else {
+          // Fallback to predefined list
+          setSupportedJurisdictions(getSupportedJurisdictions());
+        }
+      } catch (error) {
+        console.error('Error loading jurisdictions:', error);
+        // Fallback to predefined list
+        setSupportedJurisdictions(getSupportedJurisdictions());
+      } finally {
+        setLoadingJurisdictions(false);
+      }
+    };
+
+    loadSupportedJurisdictions();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -184,14 +215,18 @@ const Register = () => {
 
                     <div className="space-y-2">
                       <Label htmlFor="jurisdiction">Jurisdiction</Label>
-                      <Select value={formData.jurisdiction} onValueChange={(value) => handleInputChange("jurisdiction", value)}>
+                      <Select 
+                        value={formData.jurisdiction} 
+                        onValueChange={(value) => handleInputChange("jurisdiction", value)}
+                        disabled={loadingJurisdictions}
+                      >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select jurisdiction" />
+                          <SelectValue placeholder={loadingJurisdictions ? "Loading jurisdictions..." : "Select jurisdiction"} />
                         </SelectTrigger>
                         <SelectContent className="bg-background border max-h-60 overflow-y-auto">
-                          {getSupportedJurisdictions().map((jurisdiction) => (
-                            <SelectItem key={jurisdiction.code} value={jurisdiction.code}>
-                              {jurisdiction.name} ({jurisdiction.code})
+                          {supportedJurisdictions.map((jurisdiction) => (
+                            <SelectItem key={jurisdiction.code || jurisdiction.jurisdiction_code} value={jurisdiction.code || jurisdiction.jurisdiction_code}>
+                              {jurisdiction.name || jurisdiction.jurisdiction_name} ({jurisdiction.code || jurisdiction.jurisdiction_code})
                             </SelectItem>
                           ))}
                         </SelectContent>
