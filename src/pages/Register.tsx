@@ -27,7 +27,9 @@ const Register = () => {
     postalCode: "",
     registrationNumber: "",
     website: "",
-    contactEmail: ""
+    contactEmail: "",
+    firstName: "",
+    lastName: ""
   });
 
   // Load supported jurisdictions on component mount
@@ -64,6 +66,8 @@ const Register = () => {
 
     // Validate required fields
     const requiredFields = [
+      { field: 'firstName', message: 'First Name is required' },
+      { field: 'lastName', message: 'Last Name is required' },
       { field: 'legalName', message: 'Legal Entity Name is required' },
       { field: 'legalForm', message: 'Legal Form is required' },
       { field: 'jurisdiction', message: 'Jurisdiction is required' },
@@ -320,6 +324,35 @@ const Register = () => {
                           </SelectContent>
                         </Select>
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Contact Person</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input
+                        id="firstName"
+                        value={formData.firstName}
+                        onChange={(e) => handleInputChange("firstName", e.target.value)}
+                        placeholder="First name"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input
+                        id="lastName"
+                        value={formData.lastName}
+                        onChange={(e) => handleInputChange("lastName", e.target.value)}
+                        placeholder="Last name"
+                        required
+                      />
                     </div>
                   </div>
                 </div>
