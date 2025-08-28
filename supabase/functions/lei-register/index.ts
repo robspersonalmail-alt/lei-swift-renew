@@ -81,13 +81,27 @@ serve(async (req) => {
       body: JSON.stringify(registrationPayload),
     });
 
+    console.log('Registration API response status:', response.status);
+    console.log('Registration API response headers:', Object.fromEntries(response.headers.entries()));
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('RapidLEI API error:', response.status, errorText);
+      console.error('Request payload was:', JSON.stringify(registrationPayload, null, 2));
       throw new Error(`RapidLEI API error: ${response.status} - ${errorText}`);
     }
 
-    const data = await response.json();
+    const responseText = await response.text();
+    console.log('Registration API response body:', responseText);
+    
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse response as JSON:', parseError);
+      console.error('Raw response:', responseText);
+      throw new Error(`Invalid JSON response from RapidLEI API`);
+    }
     console.log('LEI registration successful:', data);
 
     return new Response(JSON.stringify({
