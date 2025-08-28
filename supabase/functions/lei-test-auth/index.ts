@@ -26,15 +26,14 @@ serve(async (req) => {
     console.log('API Key (first 10 chars):', RAPIDLEI_API_KEY?.substring(0, 10));
     console.log('API Key (last 5 chars):', RAPIDLEI_API_KEY?.slice(-5));
 
-    // Test OAuth2 authentication
+    // Test RapidLEI specific authentication format
     const authParams = new URLSearchParams();
     authParams.append('apiKey', RAPIDLEI_API_KEY);
     authParams.append('email', RAPIDLEI_EMAIL);
     
     console.log('Auth parameters:', {
-      grant_type: 'client_credentials',
-      client_id: RAPIDLEI_EMAIL,
-      client_secret: RAPIDLEI_API_KEY?.substring(0, 10) + '...'
+      apiKey: RAPIDLEI_API_KEY?.substring(0, 10) + '...',
+      email: RAPIDLEI_EMAIL
     });
     
     const authResponse = await fetch(`${RAPIDLEI_BASE_URL}/v1/auth/token`, {
