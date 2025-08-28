@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.lei-renew]
 verify_jwt = false
+
+[functions.lei-test-auth]
+verify_jwt = false
