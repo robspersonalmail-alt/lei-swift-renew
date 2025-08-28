@@ -12,7 +12,6 @@ const Register = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [apiKey, setApiKey] = useState("");
   const [formData, setFormData] = useState({
     legalName: "",
     legalForm: "",
@@ -28,14 +27,6 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!apiKey) {
-      toast({
-        title: "API Key Required",
-        description: "Please enter your RapidLEI API key to proceed.",
-        variant: "destructive"
-      });
-      return;
-    }
 
     setLoading(true);
     try {
@@ -103,22 +94,6 @@ const Register = () => {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* API Key Input */}
-                <div className="space-y-2">
-                  <Label htmlFor="apiKey">RapidLEI API Key</Label>
-                  <Input
-                    id="apiKey"
-                    type="password"
-                    value={apiKey}
-                    onChange={(e) => setApiKey(e.target.value)}
-                    placeholder="Enter your API key"
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    This will be used to authenticate with the RapidLEI service.
-                  </p>
-                </div>
-
                 {/* Entity Information */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold">Entity Information</h3>

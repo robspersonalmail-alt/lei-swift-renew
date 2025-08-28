@@ -12,7 +12,6 @@ const Renew = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [lookupLoading, setLookupLoading] = useState(false);
-  const [apiKey, setApiKey] = useState("");
   const [leiNumber, setLeiNumber] = useState("");
   const [entityData, setEntityData] = useState<any>(null);
   const [formData, setFormData] = useState({
@@ -25,10 +24,10 @@ const Renew = () => {
   });
 
   const handleLookup = async () => {
-    if (!apiKey || !leiNumber) {
+    if (!leiNumber) {
       toast({
-        title: "Required Fields Missing",
-        description: "Please enter both your API key and LEI number.",
+        title: "LEI Number Required",
+        description: "Please enter your LEI number.",
         variant: "destructive"
       });
       return;
@@ -150,17 +149,6 @@ const Renew = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="apiKey">RapidLEI API Key</Label>
-                <Input
-                  id="apiKey"
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="Enter your API key"
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="leiNumber">LEI Number</Label>
                 <Input
                   id="leiNumber"
@@ -173,7 +161,7 @@ const Renew = () => {
 
               <Button 
                 onClick={handleLookup} 
-                disabled={lookupLoading || !apiKey || !leiNumber}
+                disabled={lookupLoading || !leiNumber}
                 className="w-full"
               >
                 {lookupLoading ? (
