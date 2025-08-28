@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.lei-fresh-test]
 verify_jwt = false
+
+[functions.lei-lookup-jurisdictions]
+verify_jwt = false

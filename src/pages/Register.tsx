@@ -9,6 +9,7 @@ import { ArrowLeft, Building2, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { countries, getCountryName } from "@/data/countries";
 import { legalForms, getLegalFormsByJurisdiction, getLegalFormName } from "@/data/legalForms";
+import { getSupportedJurisdictions } from "@/data/supportedJurisdictions";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -188,9 +189,9 @@ const Register = () => {
                           <SelectValue placeholder="Select jurisdiction" />
                         </SelectTrigger>
                         <SelectContent className="bg-background border max-h-60 overflow-y-auto">
-                          {countries.map((country) => (
-                            <SelectItem key={country.code} value={country.code}>
-                              {country.name} ({country.code})
+                          {getSupportedJurisdictions().map((jurisdiction) => (
+                            <SelectItem key={jurisdiction.code} value={jurisdiction.code}>
+                              {jurisdiction.name} ({jurisdiction.code})
                             </SelectItem>
                           ))}
                         </SelectContent>
