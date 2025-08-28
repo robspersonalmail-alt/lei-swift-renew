@@ -57,7 +57,7 @@ serve(async (req) => {
       companyName: formData.legalName,
       legalForm: formData.legalForm,
       legalJurisdiction: formData.jurisdiction,
-      registrationNumber: formData.registrationNumber,
+      companyNumber: formData.registrationNumber,
       address: {
         streetAddress: formData.address,
         city: formData.city,
