@@ -7,6 +7,7 @@ const corsHeaders = {
 };
 
 const RAPIDLEI_API_KEY = Deno.env.get('RAPIDLEI_API_KEY');
+const RAPIDLEI_EMAIL = Deno.env.get('RAPIDLEI_EMAIL');
 const RAPIDLEI_BASE_URL = 'https://api.rapidlei.com'; // Base URL from RapidLEI API
 
 serve(async (req) => {
@@ -16,8 +17,8 @@ serve(async (req) => {
   }
 
   try {
-    if (!RAPIDLEI_API_KEY) {
-      throw new Error('RapidLEI API key not configured');
+    if (!RAPIDLEI_API_KEY || !RAPIDLEI_EMAIL) {
+      throw new Error('RapidLEI API key and email not configured');
     }
 
     const { formData } = await req.json();
@@ -32,7 +33,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         apiKey: RAPIDLEI_API_KEY,
-        email: "your-account-email@domain.com" // This should be configured as a secret too
+        email: RAPIDLEI_EMAIL
       }),
     });
 
