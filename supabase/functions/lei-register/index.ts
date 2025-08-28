@@ -25,6 +25,32 @@ serve(async (req) => {
     
     console.log('Registering new LEI with data:', formData);
 
+    // First, get access token using correct OAuth2 format
+    const authParams = new URLSearchParams();
+    authParams.append('apiKey', RAPIDLEI_API_KEY);
+    authParams.append('email', RAPIDLEI_EMAIL);
+    
+    const authResponse = await fetch(`${RAPIDLEI_BASE_URL}/v1/auth/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json'
+      },
+      body: authParams,
+    });
+
+    console.log('Auth response status:', authResponse.status);
+
+    if (!authResponse.ok) {
+      const authError = await authResponse.text();
+      console.error('RapidLEI Auth error:', authResponse.status, authError);
+      throw new Error(`RapidLEI Auth error: ${authResponse.status} - ${authError}`);
+    }
+
+    const authData = await authResponse.json();
+    const accessToken = authData.accessToken;
+    console.log('Successfully obtained access token');
+
     // Prepare the LEI registration request according to RapidLEI API specs
     const registrationPayload = {
       legalName: formData.legalName,
@@ -42,16 +68,12 @@ serve(async (req) => {
     };
 
     console.log('Sending registration payload:', registrationPayload);
-    console.log('Using API Key (first 10 chars):', RAPIDLEI_API_KEY?.substring(0, 10));
-    console.log('Using Email:', RAPIDLEI_EMAIL);
 
-    // Try Basic authentication with API key
-    const authString = btoa(`${RAPIDLEI_EMAIL}:${RAPIDLEI_API_KEY}`);
-    
+    // Make request to RapidLEI API with Bearer token
     const response = await fetch(`${RAPIDLEI_BASE_URL}/v1/leis/orders/create`, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${authString}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
