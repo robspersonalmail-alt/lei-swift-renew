@@ -25,25 +25,6 @@ serve(async (req) => {
     
     console.log('Registering new LEI with data:', formData);
 
-    // First, get access token - try form data format
-    const authFormData = new FormData();
-    authFormData.append('apiKey', RAPIDLEI_API_KEY);
-    authFormData.append('email', RAPIDLEI_EMAIL);
-    
-    const authResponse = await fetch(`${RAPIDLEI_BASE_URL}/v1/auth/token`, {
-      method: 'POST',
-      body: authFormData,
-    });
-
-    if (!authResponse.ok) {
-      const authError = await authResponse.text();
-      console.error('RapidLEI Auth error:', authResponse.status, authError);
-      throw new Error(`RapidLEI Auth error: ${authResponse.status} - ${authError}`);
-    }
-
-    const authData = await authResponse.json();
-    const accessToken = authData.accessToken;
-
     // Prepare the LEI registration request according to RapidLEI API specs
     const registrationPayload = {
       legalName: formData.legalName,
@@ -60,12 +41,15 @@ serve(async (req) => {
       website: formData.website
     };
 
-    // Make request to RapidLEI API with access token
+    console.log('Sending registration payload:', registrationPayload);
+
+    // Try direct API key authentication instead of token exchange
     const response = await fetch(`${RAPIDLEI_BASE_URL}/v1/leis/orders/create`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        'Authorization': `ApiKey ${RAPIDLEI_API_KEY}`,
         'Content-Type': 'application/json',
+        'User-Agent': 'Lovable-LEI-App/1.0'
       },
       body: JSON.stringify(registrationPayload),
     });
