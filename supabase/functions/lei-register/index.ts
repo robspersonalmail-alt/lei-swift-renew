@@ -25,10 +25,11 @@ serve(async (req) => {
     
     console.log('Registering new LEI with data:', formData);
 
-    // First, get access token using RapidLEI specific format
+    // First, get access token using correct OAuth2 format
     const authParams = new URLSearchParams();
-    authParams.append('apiKey', RAPIDLEI_API_KEY);
-    authParams.append('email', RAPIDLEI_EMAIL);
+    authParams.append('grant_type', 'client_credentials');
+    authParams.append('client_id', RAPIDLEI_EMAIL);
+    authParams.append('client_secret', RAPIDLEI_API_KEY);
     
     const authResponse = await fetch(`${RAPIDLEI_BASE_URL}/v1/auth/token`, {
       method: 'POST',
@@ -48,7 +49,7 @@ serve(async (req) => {
     }
 
     const authData = await authResponse.json();
-    const accessToken = authData.accessToken;
+    const accessToken = authData.access_token;
     console.log('Successfully obtained access token');
 
     // Prepare the LEI registration request according to RapidLEI API specs

@@ -24,10 +24,11 @@ serve(async (req) => {
       throw new Error('Missing credentials');
     }
 
-    // Try the exact format that worked before
+    // Use correct OAuth2 format as per RapidLEI documentation
     const authParams = new URLSearchParams();
-    authParams.append('apiKey', RAPIDLEI_API_KEY);
-    authParams.append('email', RAPIDLEI_EMAIL);
+    authParams.append('grant_type', 'client_credentials');
+    authParams.append('client_id', RAPIDLEI_EMAIL);
+    authParams.append('client_secret', RAPIDLEI_API_KEY);
     
     console.log('Attempting authentication with staging API...');
     

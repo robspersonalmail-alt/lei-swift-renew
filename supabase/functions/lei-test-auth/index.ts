@@ -26,10 +26,11 @@ serve(async (req) => {
     console.log('API Key (first 10 chars):', RAPIDLEI_API_KEY?.substring(0, 10));
     console.log('API Key (last 5 chars):', RAPIDLEI_API_KEY?.slice(-5));
 
-    // Test RapidLEI specific authentication format
+    // Use correct OAuth2 format as per RapidLEI documentation
     const authParams = new URLSearchParams();
-    authParams.append('apiKey', RAPIDLEI_API_KEY);
-    authParams.append('email', RAPIDLEI_EMAIL);
+    authParams.append('grant_type', 'client_credentials');
+    authParams.append('client_id', RAPIDLEI_EMAIL);
+    authParams.append('client_secret', RAPIDLEI_API_KEY);
     
     console.log('Auth parameters:', {
       apiKey: RAPIDLEI_API_KEY?.substring(0, 10) + '...',

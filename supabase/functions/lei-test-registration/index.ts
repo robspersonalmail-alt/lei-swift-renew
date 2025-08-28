@@ -23,11 +23,12 @@ serve(async (req) => {
     const { formData } = await req.json();
     console.log('Testing LEI registration with data:', formData);
 
-    // Step 1: Authentication (same as working test)
+    // Step 1: Authentication using correct OAuth2 format
     console.log('Step 1: Testing authentication...');
     const authParams = new URLSearchParams();
-    authParams.append('apiKey', RAPIDLEI_API_KEY);
-    authParams.append('email', RAPIDLEI_EMAIL);
+    authParams.append('grant_type', 'client_credentials');
+    authParams.append('client_id', RAPIDLEI_EMAIL);
+    authParams.append('client_secret', RAPIDLEI_API_KEY);
     
     const authResponse = await fetch(`${RAPIDLEI_BASE_URL}/v1/auth/token`, {
       method: 'POST',
@@ -54,7 +55,7 @@ serve(async (req) => {
     }
 
     const authData = JSON.parse(authResponseText);
-    const accessToken = authData.accessToken;
+    const accessToken = authData.access_token;
     console.log('Authentication successful, got token');
 
     // Step 2: LEI Registration
