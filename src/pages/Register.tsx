@@ -31,7 +31,7 @@ const Register = () => {
     if (!apiKey) {
       toast({
         title: "API Key Required",
-        description: "Please enter your ubisecure/rapid ley API key to proceed.",
+        description: "Please enter your RapidLEI API key to proceed.",
         variant: "destructive"
       });
       return;
@@ -39,20 +39,31 @@ const Register = () => {
 
     setLoading(true);
     try {
-      // Simulated API call - replace with actual ubisecure/rapid ley API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { data, error } = await supabase.functions.invoke('lei-register', {
+        body: { formData }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'Registration failed');
+      }
       
       toast({
         title: "Registration Successful",
-        description: "Your LEI registration has been submitted and is being processed.",
+        description: `Your LEI registration has been submitted. ${data.leiNumber ? `LEI Number: ${data.leiNumber}` : 'Processing...'}`,
       });
       
-      // Navigate to success page or back to home
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         title: "Registration Failed", 
-        description: "There was an error processing your registration. Please try again.",
+        description: error.message || "There was an error processing your registration. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -94,7 +105,7 @@ const Register = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* API Key Input */}
                 <div className="space-y-2">
-                  <Label htmlFor="apiKey">ubisecure/rapid ley API Key</Label>
+                  <Label htmlFor="apiKey">RapidLEI API Key</Label>
                   <Input
                     id="apiKey"
                     type="password"
@@ -104,7 +115,7 @@ const Register = () => {
                     required
                   />
                   <p className="text-xs text-muted-foreground">
-                    This will be used to authenticate with the ubisecure/rapid ley service.
+                    This will be used to authenticate with the RapidLEI service.
                   </p>
                 </div>
 

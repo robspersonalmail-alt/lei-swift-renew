@@ -36,30 +36,33 @@ const Renew = () => {
 
     setLookupLoading(true);
     try {
-      // Simulated API call to lookup LEI - replace with actual ubisecure/rapid ley API
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const { supabase } = await import("@/integrations/supabase/client");
       
-      // Mock entity data
-      const mockData = {
-        legalName: "Example Corporation Ltd.",
-        legalForm: "Corporation",
-        jurisdiction: "Delaware, US",
-        registrationNumber: "123456789",
-        status: "Active",
-        expirationDate: "2024-12-31"
-      };
+      const { data, error } = await supabase.functions.invoke('lei-lookup', {
+        body: { leiNumber }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'LEI lookup failed');
+      }
       
-      setEntityData(mockData);
+      setEntityData(data.entityData);
       toast({
         title: "LEI Found",
         description: "Successfully retrieved LEI information.",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('LEI lookup error:', error);
       toast({
         title: "Lookup Failed",
-        description: "Could not find LEI information. Please check your LEI number and try again.",
+        description: error.message || "Could not find LEI information. Please check your LEI number and try again.",
         variant: "destructive"
       });
+      setEntityData(null);
     } finally {
       setLookupLoading(false);
     }
@@ -78,19 +81,31 @@ const Renew = () => {
 
     setLoading(true);
     try {
-      // Simulated API call for renewal - replace with actual ubisecure/rapid ley API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const { supabase } = await import("@/integrations/supabase/client");
+      
+      const { data, error } = await supabase.functions.invoke('lei-renew', {
+        body: { leiNumber, formData }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (!data.success) {
+        throw new Error(data.error || 'LEI renewal failed');
+      }
       
       toast({
         title: "Renewal Successful",
-        description: "Your LEI has been successfully renewed for another year.",
+        description: `Your LEI has been successfully renewed. ${data.newExpirationDate ? `New expiration: ${data.newExpirationDate}` : ''}`,
       });
       
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
+      console.error('LEI renewal error:', error);
       toast({
         title: "Renewal Failed",
-        description: "There was an error processing your renewal. Please try again.",
+        description: error.message || "There was an error processing your renewal. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -135,7 +150,7 @@ const Renew = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="apiKey">ubisecure/rapid ley API Key</Label>
+                <Label htmlFor="apiKey">RapidLEI API Key</Label>
                 <Input
                   id="apiKey"
                   type="password"

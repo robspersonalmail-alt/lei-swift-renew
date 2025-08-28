@@ -1,1 +1,10 @@
 project_id = "uvmvyjyqjmqjbxaezkls"
+
+[functions.lei-register]
+verify_jwt = false
+
+[functions.lei-lookup]
+verify_jwt = false
+
+[functions.lei-renew]
+verify_jwt = false
