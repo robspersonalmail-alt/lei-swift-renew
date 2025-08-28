@@ -42,14 +42,18 @@ serve(async (req) => {
     };
 
     console.log('Sending registration payload:', registrationPayload);
+    console.log('Using API Key (first 10 chars):', RAPIDLEI_API_KEY?.substring(0, 10));
+    console.log('Using Email:', RAPIDLEI_EMAIL);
 
-    // Try direct API key authentication instead of token exchange
+    // Try Basic authentication with API key
+    const authString = btoa(`${RAPIDLEI_EMAIL}:${RAPIDLEI_API_KEY}`);
+    
     const response = await fetch(`${RAPIDLEI_BASE_URL}/v1/leis/orders/create`, {
       method: 'POST',
       headers: {
-        'Authorization': `ApiKey ${RAPIDLEI_API_KEY}`,
+        'Authorization': `Basic ${authString}`,
         'Content-Type': 'application/json',
-        'User-Agent': 'Lovable-LEI-App/1.0'
+        'Accept': 'application/json'
       },
       body: JSON.stringify(registrationPayload),
     });
