@@ -8,7 +8,7 @@ const corsHeaders = {
 
 const RAPIDLEI_API_KEY = Deno.env.get('RAPIDLEI_API_KEY');
 const RAPIDLEI_EMAIL = Deno.env.get('RAPIDLEI_EMAIL');
-const RAPIDLEI_BASE_URL = 'https://api.rapidlei.com'; // Production API URL (staging uses same endpoint)
+const RAPIDLEI_BASE_URL = 'https://apistaging.rapidlei.com'; // Staging API URL
 
 serve(async (req) => {
   // Handle CORS preflight requests
