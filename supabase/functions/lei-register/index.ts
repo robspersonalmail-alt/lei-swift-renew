@@ -27,8 +27,9 @@ serve(async (req) => {
 
     // First, get access token using correct OAuth2 format
     const authParams = new URLSearchParams();
-    authParams.append('apiKey', RAPIDLEI_API_KEY);
-    authParams.append('email', RAPIDLEI_EMAIL);
+    authParams.append('grant_type', 'client_credentials');
+    authParams.append('client_id', RAPIDLEI_EMAIL);
+    authParams.append('client_secret', RAPIDLEI_API_KEY);
     
     const authResponse = await fetch(`${RAPIDLEI_BASE_URL}/v1/auth/token`, {
       method: 'POST',
