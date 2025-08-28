@@ -28,12 +28,81 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate required fields
+    const requiredFields = [
+      { field: 'legalName', message: 'Legal Entity Name is required' },
+      { field: 'legalForm', message: 'Legal Form is required' },
+      { field: 'jurisdiction', message: 'Jurisdiction is required' },
+      { field: 'registrationNumber', message: 'Registration Number is required' },
+      { field: 'address', message: 'Street Address is required' },
+      { field: 'city', message: 'City is required' },
+      { field: 'postalCode', message: 'Postal Code is required' },
+      { field: 'country', message: 'Country is required' },
+      { field: 'contactEmail', message: 'Contact Email is required' }
+    ];
+
+    for (const { field, message } of requiredFields) {
+      if (!formData[field as keyof typeof formData]?.trim()) {
+        toast({
+          title: "Required Field Missing",
+          description: message,
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.contactEmail)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate legal name length (minimum 3 characters)
+    if (formData.legalName.trim().length < 3) {
+      toast({
+        title: "Invalid Legal Name",
+        description: "Legal Entity Name must be at least 3 characters long",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate registration number format (alphanumeric, at least 3 characters)
+    if (formData.registrationNumber.trim().length < 3) {
+      toast({
+        title: "Invalid Registration Number",
+        description: "Registration Number must be at least 3 characters long",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setLoading(true);
     try {
       const { supabase } = await import("@/integrations/supabase/client");
       
+      // Prepare clean data for submission
+      const cleanFormData = {
+        ...formData,
+        legalName: formData.legalName.trim(),
+        jurisdiction: formData.jurisdiction.trim(),
+        address: formData.address.trim(),
+        city: formData.city.trim(),
+        country: formData.country.trim().toUpperCase(), // Country codes are typically uppercase
+        postalCode: formData.postalCode.trim(),
+        registrationNumber: formData.registrationNumber.trim(),
+        contactEmail: formData.contactEmail.trim().toLowerCase(),
+        website: formData.website.trim() || undefined // Remove empty string
+      };
+      
       const { data, error } = await supabase.functions.invoke('lei-register', {
-        body: { formData }
+        body: { formData: cleanFormData }
       });
 
       if (error) {
