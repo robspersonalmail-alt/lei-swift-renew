@@ -24,6 +24,27 @@ serve(async (req) => {
     
     console.log('Registering new LEI with data:', formData);
 
+    // First, get access token
+    const authResponse = await fetch(`${RAPIDLEI_BASE_URL}/v1/auth/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        apiKey: RAPIDLEI_API_KEY,
+        email: "your-account-email@domain.com" // This should be configured as a secret too
+      }),
+    });
+
+    if (!authResponse.ok) {
+      const authError = await authResponse.text();
+      console.error('RapidLEI Auth error:', authResponse.status, authError);
+      throw new Error(`RapidLEI Auth error: ${authResponse.status} - ${authError}`);
+    }
+
+    const authData = await authResponse.json();
+    const accessToken = authData.accessToken;
+
     // Prepare the LEI registration request according to RapidLEI API specs
     const registrationPayload = {
       legalName: formData.legalName,
@@ -40,11 +61,11 @@ serve(async (req) => {
       website: formData.website
     };
 
-    // Make request to RapidLEI API
+    // Make request to RapidLEI API with access token
     const response = await fetch(`${RAPIDLEI_BASE_URL}/v1/leis/orders/create`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${RAPIDLEI_API_KEY}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(registrationPayload),
