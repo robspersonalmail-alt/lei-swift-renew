@@ -88,6 +88,8 @@ serve(async (req) => {
       const errorText = await response.text();
       console.error('RapidLEI API error:', response.status, errorText);
       console.error('Request payload was:', JSON.stringify(registrationPayload, null, 2));
+      console.error('Request URL was:', `${RAPIDLEI_BASE_URL}/v1/leis/orders/create`);
+      console.error('Access token (first 20 chars):', accessToken ? accessToken.substring(0, 20) + '...' : 'null');
       throw new Error(`RapidLEI API error: ${response.status} - ${errorText}`);
     }
 
