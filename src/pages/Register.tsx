@@ -35,7 +35,7 @@ const Register = () => {
     multiYearSupport: 1
   });
 
-  // Load supported jurisdictions on component mount
+  // Load supported jurisdictions from RapidLEI API
   React.useEffect(() => {
     const loadSupportedJurisdictions = async () => {
       try {
@@ -47,7 +47,13 @@ const Register = () => {
           // Fallback to predefined list
           setSupportedJurisdictions(getSupportedJurisdictions());
         } else if (data?.success && data?.jurisdictions) {
-          setSupportedJurisdictions(data.jurisdictions);
+          // Transform API response to match our interface
+          const transformedJurisdictions = data.jurisdictions.map((jurisdiction: any) => ({
+            code: jurisdiction.jurisdiction_code || jurisdiction.code,
+            name: jurisdiction.jurisdiction_name || jurisdiction.name,
+            supported: true
+          }));
+          setSupportedJurisdictions(transformedJurisdictions);
         } else {
           // Fallback to predefined list
           setSupportedJurisdictions(getSupportedJurisdictions());
@@ -234,8 +240,8 @@ const Register = () => {
                         </SelectTrigger>
                         <SelectContent className="bg-background border max-h-60 overflow-y-auto">
                           {supportedJurisdictions.map((jurisdiction) => (
-                            <SelectItem key={jurisdiction.code || jurisdiction.jurisdiction_code} value={jurisdiction.code || jurisdiction.jurisdiction_code}>
-                              {jurisdiction.name || jurisdiction.jurisdiction_name} ({jurisdiction.code || jurisdiction.jurisdiction_code})
+                            <SelectItem key={jurisdiction.code} value={jurisdiction.code}>
+                              {jurisdiction.name} ({jurisdiction.code})
                             </SelectItem>
                           ))}
                         </SelectContent>
