@@ -6,8 +6,9 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const RAPIDLEI_API_KEY = Deno.env.get('RAPIDLEI_API_KEY');
-const RAPIDLEI_BASE_URL = 'https://api.rapidlei.com';
+const apiKey = Deno.env.get('RAPIDLEI_API_KEY')
+const email = Deno.env.get('RAPIDLEI_EMAIL') 
+const baseUrl = Deno.env.get('RAPIDLEI_BASE_URL')
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -16,8 +17,8 @@ serve(async (req) => {
   }
 
   try {
-    if (!RAPIDLEI_API_KEY) {
-      throw new Error('RapidLEI API key not configured');
+    if (!apiKey || !email || !baseUrl) {
+      throw new Error('RapidLEI credentials not properly configured');
     }
 
     const { leiNumber, formData } = await req.json();
@@ -28,12 +29,37 @@ serve(async (req) => {
 
     console.log('Renewing LEI:', leiNumber, 'with updated data:', formData);
 
-    // Prepare the LEI renewal request according to RapidLEI API specs
+    // Step 1: Get access token
+    const authResponse = await fetch(`${baseUrl}/v1/auth/token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        grant_type: 'client_credentials',
+        client_id: email,
+        client_secret: apiKey,
+      }),
+    });
+
+    if (!authResponse.ok) {
+      const authError = await authResponse.text();
+      console.error('Auth failed:', authError);
+      throw new Error(`Authentication failed: ${authResponse.status} - ${authError}`);
+    }
+
+    const authData = await authResponse.json();
+    console.log('Successfully obtained access token');
+
+    // Step 2: Prepare the renewal payload with all available fields
     const renewalPayload = {
       leiNumber: leiNumber,
-      contactEmail: formData.contactEmail,
+      email: formData.contactEmail || undefined,
+      phone: formData.contactPhone || undefined,
+      firstName: formData.firstName || undefined,
+      lastName: formData.lastName || undefined,
       website: formData.website || undefined,
-      updatedAddress: formData.address ? {
+      address: formData.address ? {
         streetAddress: formData.address,
         city: formData.city,
         postalCode: formData.postalCode,
@@ -46,15 +72,17 @@ serve(async (req) => {
       renewalPayload[key] === undefined && delete renewalPayload[key]
     );
 
-    // Make request to RapidLEI API
-    const response = await fetch(`${RAPIDLEI_BASE_URL}/v1/leis/${leiNumber}/renew`, {
+    // Step 3: Make request to RapidLEI API with access token
+    const response = await fetch(`${baseUrl}/v1/leis/${leiNumber}/renew`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${RAPIDLEI_API_KEY}`,
+        'Authorization': `Bearer ${authData.access_token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(renewalPayload),
     });
+
+    console.log('Renewal API response status:', response.status);
 
     if (!response.ok) {
       const errorText = await response.text();

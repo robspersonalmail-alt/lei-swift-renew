@@ -1,11 +1,13 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Building2, Loader2, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { countries } from "@/data/countries";
 
 const Renew = () => {
   const navigate = useNavigate();
@@ -16,6 +18,9 @@ const Renew = () => {
   const [entityData, setEntityData] = useState<any>(null);
   const [formData, setFormData] = useState({
     contactEmail: "",
+    firstName: "",
+    lastName: "", 
+    contactPhone: "",
     website: "",
     address: "",
     city: "",
@@ -73,6 +78,34 @@ const Renew = () => {
       toast({
         title: "Entity Lookup Required",
         description: "Please lookup your LEI information first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate required fields
+    const requiredFields = [
+      { field: 'contactEmail', message: 'Contact Email is required' }
+    ];
+
+    for (const { field, message } of requiredFields) {
+      const value = formData[field as keyof typeof formData];
+      if (!value || (typeof value === 'string' && !value.trim())) {
+        toast({
+          title: "Required Field Missing",
+          description: message,
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.contactEmail)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address",
         variant: "destructive"
       });
       return;
@@ -224,6 +257,33 @@ const Renew = () => {
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleRenewal} className="space-y-6">
+                  {/* Contact Person */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Contact Person</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName">First Name (Optional)</Label>
+                        <Input
+                          id="firstName"
+                          value={formData.firstName}
+                          onChange={(e) => handleInputChange("firstName", e.target.value)}
+                          placeholder="First name"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName">Last Name (Optional)</Label>
+                        <Input
+                          id="lastName"
+                          value={formData.lastName}
+                          onChange={(e) => handleInputChange("lastName", e.target.value)}
+                          placeholder="Last name"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Contact Information */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold">Contact Information</h3>
@@ -238,6 +298,17 @@ const Renew = () => {
                           onChange={(e) => handleInputChange("contactEmail", e.target.value)}
                           placeholder="contact@example.com"
                           required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="contactPhone">Contact Phone (Optional)</Label>
+                        <Input
+                          id="contactPhone"
+                          type="tel"
+                          value={formData.contactPhone}
+                          onChange={(e) => handleInputChange("contactPhone", e.target.value)}
+                          placeholder="+1234567890"
                         />
                       </div>
 
@@ -290,15 +361,21 @@ const Renew = () => {
                           />
                         </div>
 
-                        <div className="space-y-2">
-                          <Label htmlFor="country">Country</Label>
-                          <Input
-                            id="country"
-                            value={formData.country}
-                            onChange={(e) => handleInputChange("country", e.target.value)}
-                            placeholder="Country"
-                          />
-                        </div>
+                         <div className="space-y-2">
+                           <Label htmlFor="country">Country</Label>
+                           <Select value={formData.country} onValueChange={(value) => handleInputChange("country", value)}>
+                             <SelectTrigger>
+                               <SelectValue placeholder="Select country" />
+                             </SelectTrigger>
+                             <SelectContent className="bg-background border max-h-60 overflow-y-auto">
+                               {countries.map((country) => (
+                                 <SelectItem key={country.code} value={country.code}>
+                                   {country.name} ({country.code})
+                                 </SelectItem>
+                               ))}
+                             </SelectContent>
+                           </Select>
+                         </div>
                       </div>
                     </div>
                   </div>
