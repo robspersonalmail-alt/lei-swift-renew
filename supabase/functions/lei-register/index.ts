@@ -25,16 +25,14 @@ serve(async (req) => {
     
     console.log('Registering new LEI with data:', formData);
 
-    // First, get access token
+    // First, get access token - try form data format
+    const authFormData = new FormData();
+    authFormData.append('apiKey', RAPIDLEI_API_KEY);
+    authFormData.append('email', RAPIDLEI_EMAIL);
+    
     const authResponse = await fetch(`${RAPIDLEI_BASE_URL}/v1/auth/token`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        apiKey: RAPIDLEI_API_KEY,
-        email: RAPIDLEI_EMAIL
-      }),
+      body: authFormData,
     });
 
     if (!authResponse.ok) {
