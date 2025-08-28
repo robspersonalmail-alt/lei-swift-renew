@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.lei-test-auth]
 verify_jwt = false
+
+[functions.lei-test-registration]
+verify_jwt = false

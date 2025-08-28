@@ -9,6 +9,7 @@ const TestAuth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [regLoading, setRegLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
 
   const testAuth = async () => {
@@ -42,6 +43,52 @@ const TestAuth = () => {
     }
   };
 
+  const testRegistration = async () => {
+    setRegLoading(true);
+    setResult(null);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const testData = {
+        legalName: "Test Company Ltd",
+        legalForm: "corporation",
+        jurisdiction: "england", 
+        address: "123 Test Street",
+        city: "London",
+        country: "UK",
+        postalCode: "SW1A 1AA",
+        registrationNumber: "12345678",
+        contactEmail: "test@example.com",
+        website: "https://test.com"
+      };
+      
+      const { data, error } = await supabase.functions.invoke('lei-test-registration', {
+        body: { formData: testData }
+      });
+      
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setResult(data);
+      toast({
+        title: data.success ? "Registration Test Successful!" : "Registration Test Failed",
+        description: data.success ? "LEI registration process works" : `Failed at ${data.step}: ${data.error}`,
+        variant: data.success ? "default" : "destructive"
+      });
+      console.log('Registration test result:', data);
+    } catch (error: any) {
+      const errorResult = { success: false, error: error.message };
+      setResult(errorResult);
+      toast({
+        title: "Test Failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setRegLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -70,8 +117,8 @@ const TestAuth = () => {
             <CardContent className="space-y-6">
               <Button 
                 onClick={testAuth}
-                disabled={loading}
-                className="w-full"
+                disabled={loading || regLoading}
+                className="w-full mb-4"
                 size="lg"
               >
                 {loading ? (
@@ -81,6 +128,23 @@ const TestAuth = () => {
                   </>
                 ) : (
                   "Test RapidLEI Authentication"
+                )}
+              </Button>
+
+              <Button 
+                onClick={testRegistration}
+                disabled={loading || regLoading}
+                className="w-full"
+                size="lg"
+                variant="outline"
+              >
+                {regLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Testing Full Registration...
+                  </>
+                ) : (
+                  "Test Full LEI Registration Process"
                 )}
               </Button>
 
