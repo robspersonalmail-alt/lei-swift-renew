@@ -302,6 +302,44 @@ const Register = () => {
                   </div>
                 </div>
 
+                {/* Test Authentication Button */}
+                <div className="pt-2">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    className="w-full mb-4" 
+                    onClick={async () => {
+                      setLoading(true);
+                      try {
+                        const { supabase } = await import("@/integrations/supabase/client");
+                        const { data, error } = await supabase.functions.invoke('lei-test-auth');
+                        
+                        if (error) {
+                          throw new Error(error.message);
+                        }
+
+                        toast({
+                          title: data.success ? "Authentication Test Successful!" : "Authentication Test Failed",
+                          description: data.success ? "Your credentials are valid" : data.error,
+                          variant: data.success ? "default" : "destructive"
+                        });
+                        console.log('Auth test result:', data);
+                      } catch (error: any) {
+                        toast({
+                          title: "Test Failed",
+                          description: error.message,
+                          variant: "destructive"
+                        });
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                  >
+                    Test Authentication Only
+                  </Button>
+                </div>
+
                 {/* Submit Button */}
                 <div className="pt-4">
                   <Button type="submit" className="w-full" size="lg" disabled={loading}>
