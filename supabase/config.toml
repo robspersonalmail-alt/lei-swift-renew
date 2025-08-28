@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.lei-test-registration]
 verify_jwt = false
+
+[functions.lei-fresh-test]
+verify_jwt = false
